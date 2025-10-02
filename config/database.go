@@ -6,6 +6,7 @@ import (
 	"log"
 
 	"github/com/cl0ky/e-voting-be/env"
+	"github/com/cl0ky/e-voting-be/models"
 
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -25,6 +26,18 @@ func NewDB(ctx context.Context) *DB {
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
 		log.Fatalf("❌ failed to connect database: %v", err)
+	}
+
+	err = db.AutoMigrate(
+		&models.User{},
+		&models.Election{},
+		&models.Candidate{},
+		&models.EligibleVoter{},
+		&models.Vote{},
+	)
+
+	if err != nil {
+		log.Fatalf("failed to migrate database: %v", err)
 	}
 
 	log.Printf("✅ Database connected! Host: %s Port: %d DB: %s", env.DBHost, env.DBPort, env.DBName)
