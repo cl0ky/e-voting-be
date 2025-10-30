@@ -32,8 +32,8 @@ func NewDB(ctx context.Context) *DB {
 		&models.User{},
 		&models.Election{},
 		&models.Candidate{},
-		&models.EligibleVoter{},
 		&models.Vote{},
+		&models.RT{},
 	)
 
 	if err != nil {

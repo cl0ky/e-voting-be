@@ -2,6 +2,7 @@ package router
 
 import (
 	"github/com/cl0ky/e-voting-be/server/middleware"
+	"github/com/cl0ky/e-voting-be/server/router/auth_router"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -28,4 +29,7 @@ func SetupRoutes(c SetupRoutesConfig) {
 	apiV1.GET("/error", func(c *gin.Context) {
 		panic("error test panic")
 	})
+
+	// Delegasi ke auth_router
+	auth_router.RegisterAuthRoutes(apiV1, c.DB)
 }

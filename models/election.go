@@ -1,16 +1,21 @@
 package models
 
-import "github.com/google/uuid"
+import (
+	"time"
+
+	"github.com/google/uuid"
+)
 
 type Election struct {
-	ID          uuid.UUID `gorm:"type:uuid;default:gen_random_uuid();primaryKey;column:id"`
-	Title       string    `gorm:"type:varchar(255);not null;column:title"`
-	Description string    `gorm:"type:text;column:description"`
-	IsActive    bool      `gorm:"default:false;column:is_active"`
+	Id      uuid.UUID `gorm:"type:uuid;default:gen_random_uuid();primaryKey;column:id"`
+	StartAt time.Time `gorm:"type:timestamp(6);not null;column:start_at"`
+	EndAt   time.Time `gorm:"type:timestamp(6);not null;column:end_at"`
+	Status  string    `gorm:"type:varchar(50);default:'upcoming';column:status"`
 
-	Candidates     []Candidate     `gorm:"foreignKey:ElectionID"`
-	EligibleVoters []EligibleVoter `gorm:"foreignKey:ElectionID"`
-	Votes          []Vote          `gorm:"foreignKey:ElectionID"`
+	BlockchainTxHash string `gorm:"type:varchar(128);column:blockchain_tx_hash"`
+
+	RTId uuid.UUID `gorm:"type:uuid;not null;column:rt_id"`
+	RT   RT        `gorm:"foreignKey:RTId;references:Id;constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
 
 	BaseModel
 }

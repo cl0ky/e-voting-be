@@ -1,16 +1,27 @@
 package models
 
-import "github.com/google/uuid"
+import (
+	"time"
+
+	"github.com/google/uuid"
+)
 
 type Vote struct {
-	ID          uuid.UUID `gorm:"type:uuid;default:gen_random_uuid();primaryKey;column:id"`
-	ElectionID  uuid.UUID `gorm:"type:uuid;not null;column:election_id"`
-	UserID      uuid.UUID `gorm:"type:uuid;not null;column:user_id"`
-	CandidateID uuid.UUID `gorm:"type:uuid;not null;column:candidate_id"`
+	Id          uuid.UUID  `gorm:"type:uuid;default:gen_random_uuid();primaryKey;column:id"`
+	VoterId     uuid.UUID  `gorm:"type:uuid;not null;column:voter_id"`
+	CandidateId *uuid.UUID `gorm:"type:uuid;column:candidate_id"`
+	ElectionId  uuid.UUID  `gorm:"type:uuid;not null;column:election_id"`
 
-	Election  Election  `gorm:"foreignKey:ElectionID;references:ID"`
-	User      User      `gorm:"foreignKey:UserID;references:ID"`
-	Candidate Candidate `gorm:"foreignKey:CandidateID;references:ID"`
+	HashVote     string     `gorm:"type:varchar(128);not null;column:hash_vote"`
+	Nonce        string     `gorm:"type:text;column:nonce"`
+	TxHashCommit string     `gorm:"type:varchar(128);column:tx_hash_commit"`
+	TxHashReveal string     `gorm:"type:varchar(128);column:tx_hash_reveal"`
+	IsRevealed   bool       `gorm:"type:boolean;default:false;column:is_revealed"`
+	RevealedAt   *time.Time `gorm:"type:timestamp(6);column:revealed_at"`
+
+	Voter     User       `gorm:"foreignKey:VoterId;references:Id;constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
+	Candidate *Candidate `gorm:"foreignKey:CandidateId;references:Id;constraint:OnUpdate:CASCADE,OnDelete:SET NULL"`
+	Election  Election   `gorm:"foreignKey:ElectionId;references:Id;constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
 
 	BaseModel
 }

@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github/com/cl0ky/e-voting-be/config"
+	"github/com/cl0ky/e-voting-be/config/seed"
 	"github/com/cl0ky/e-voting-be/env"
 	"github/com/cl0ky/e-voting-be/server/router"
 	"log"
@@ -30,6 +31,10 @@ func main() {
 
 	db := config.NewDB(ctx)
 	defer db.Close()
+
+	if err := seed.SeedRT(db.Instance()); err != nil {
+		log.Fatalf("Gagal seeding RT: %v", err)
+	}
 
 	router.SetupRoutes(router.SetupRoutesConfig{
 		Router: app,

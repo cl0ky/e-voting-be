@@ -3,13 +3,14 @@ package models
 import "github.com/google/uuid"
 
 type Candidate struct {
-	ID         uuid.UUID `gorm:"type:uuid;default:gen_random_uuid();primaryKey;column:id"`
-	ElectionID uuid.UUID `gorm:"type:uuid;not null;column:election_id"`
-	Name       string    `gorm:"type:varchar(255);not null;column:name"`
-	Vision     string    `gorm:"type:text;column:vision"`
-	Mission    string    `gorm:"type:text;column:mission"`
+	Id       uuid.UUID `gorm:"type:uuid;default:gen_random_uuid();primaryKey;column:id"`
+	Name     string    `gorm:"type:varchar(255);not null;column:name"`
+	Vision   string    `gorm:"type:text;column:vision"`
+	Mission  string    `gorm:"type:text;column:mission"`
+	PhotoURL string    `gorm:"type:varchar(255);column:photo_url"`
 
-	Election Election `gorm:"foreignKey:ElectionID;references:ID"`
+	RTId uuid.UUID `gorm:"type:uuid;not null;column:rt_id"`
+	RT   RT        `gorm:"foreignKey:RTId;references:Id;constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
 
 	BaseModel
 }
