@@ -30,6 +30,5 @@ func SetupRoutes(c SetupRoutesConfig) {
 		panic("error test panic")
 	})
 
-	// Delegasi ke auth_router
-	auth_router.RegisterAuthRoutes(apiV1, c.DB)
+	auth_router.Init(apiV1, c.DB)
 }

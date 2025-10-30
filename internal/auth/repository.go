@@ -9,6 +9,9 @@ import (
 type Repository interface {
 	IsEmailOrNIKExist(email, nik string) (bool, error)
 	CreateUser(user *models.User) error
+	GetUserByEmail(email string) (*models.User, error)
+	GetUserByEmailOrNIK(emailOrNIK string) (*models.User, error)
+	GetUserByID(id string) (*models.User, error)
 }
 
 type repository struct {
@@ -35,4 +38,31 @@ func (r *repository) IsEmailOrNIKExist(email, nik string) (bool, error) {
 
 func (r *repository) CreateUser(user *models.User) error {
 	return r.db.Create(user).Error
+}
+
+func (r *repository) GetUserByEmail(email string) (*models.User, error) {
+	var user models.User
+	err := r.db.Where("email = ?", email).First(&user).Error
+	if err != nil {
+		return nil, err
+	}
+	return &user, nil
+}
+
+func (r *repository) GetUserByID(id string) (*models.User, error) {
+	var user models.User
+	err := r.db.Where("id = ?", id).First(&user).Error
+	if err != nil {
+		return nil, err
+	}
+	return &user, nil
+}
+
+func (r *repository) GetUserByEmailOrNIK(emailOrNIK string) (*models.User, error) {
+	var user models.User
+	err := r.db.Where("email = ? OR nik = ?", emailOrNIK, emailOrNIK).First(&user).Error
+	if err != nil {
+		return nil, err
+	}
+	return &user, nil
 }

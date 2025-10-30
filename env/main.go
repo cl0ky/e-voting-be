@@ -18,6 +18,7 @@ var (
 	DBPassword   string
 	DBName       string
 	DBString     string
+	JWTSecret    string
 )
 
 func GetEnv() {
@@ -33,6 +34,9 @@ func GetEnv() {
 	DBPassword = os.Getenv("PG_PASSWORD")
 	DBName = os.Getenv("PG_DATABASE")
 	DBString = os.Getenv("DB_STRING")
+
+	// JWT Secret
+	JWTSecret = os.Getenv("JWT_SECRET")
 }
 
 func parseToUint(val string, def ...uint64) uint64 {

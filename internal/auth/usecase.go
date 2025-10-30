@@ -2,7 +2,11 @@ package auth
 
 import (
 	"errors"
+	"time"
+
+	env "github/com/cl0ky/e-voting-be/env"
 	"github/com/cl0ky/e-voting-be/models"
+	jwtutil "github/com/cl0ky/e-voting-be/pkg/jwt"
 
 	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
@@ -11,6 +15,8 @@ import (
 
 type UseCase interface {
 	Register(req RegisterRequest) (RegisterResponse, error)
+	Login(req LoginRequest) (LoginResponse, error)
+	GetProfile(userId string) (*models.User, error)
 }
 
 type useCase struct {
@@ -60,4 +66,32 @@ func (us *useCase) Register(req RegisterRequest) (RegisterResponse, error) {
 		UserID:  user.Id.String(),
 		Message: "Registrasi berhasil",
 	}, nil
+}
+
+func (us *useCase) Login(req LoginRequest) (LoginResponse, error) {
+	user, err := us.repo.GetUserByEmailOrNIK(req.EmailOrNIK)
+	if err != nil {
+		return LoginResponse{}, errors.New("email/nik atau password salah")
+	}
+
+	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(req.Password))
+	if err != nil {
+		return LoginResponse{}, errors.New("email/nik atau password salah")
+	}
+
+	jwtManager := jwtutil.NewJWTManager(env.JWTSecret, 24*time.Hour)
+	token, err := jwtManager.Generate(user.Id.String(), user.Role)
+	if err != nil {
+		return LoginResponse{}, errors.New("gagal generate token")
+	}
+
+	return LoginResponse{
+		Token:   token,
+		Role:    user.Role,
+		Message: "Login berhasil",
+	}, nil
+}
+
+func (us *useCase) GetProfile(userId string) (*models.User, error) {
+	return us.repo.GetUserByID(userId)
 }
