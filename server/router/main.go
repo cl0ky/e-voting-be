@@ -3,6 +3,8 @@ package router
 import (
 	"github/com/cl0ky/e-voting-be/server/middleware"
 	"github/com/cl0ky/e-voting-be/server/router/auth_router"
+	"github/com/cl0ky/e-voting-be/server/router/candidates_router"
+	"github/com/cl0ky/e-voting-be/server/router/rts_router"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -30,5 +32,9 @@ func SetupRoutes(c SetupRoutesConfig) {
 		panic("error test panic")
 	})
 
-	auth_router.Init(apiV1, c.DB)
+	authGroup := apiV1.Group("/auth")
+	auth_router.Init(authGroup, c.DB)
+
+	rts_router.Init(apiV1, c.DB)
+	candidates_router.Init(apiV1, c.DB)
 }

@@ -12,6 +12,9 @@ type Candidate struct {
 	RTId uuid.UUID `gorm:"type:uuid;not null;column:rt_id"`
 	RT   RT        `gorm:"foreignKey:RTId;references:Id;constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
 
+	ElectionId *uuid.UUID `gorm:"type:uuid;column:election_id"`
+	Election   *Election  `gorm:"foreignKey:ElectionId;references:Id;constraint:OnUpdate:CASCADE,OnDelete:SET NULL"`
+
 	BaseModel
 }
 

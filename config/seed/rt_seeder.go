@@ -15,11 +15,11 @@ func SeedRT(db *gorm.DB) error {
 	}
 
 	rts := []models.RT{
-		{Id: uuid.New(), Name: "RT 16", Region: "RW 08, Kelurahan Palmeriam, Kecamatan Matraman, Kota Jakarta Timur"},
-		{Id: uuid.New(), Name: "RT 17", Region: "RW 08, Kelurahan Palmeriam, Kecamatan Matraman, Kota Jakarta Timur"},
-		{Id: uuid.New(), Name: "RT 18", Region: "RW 08, Kelurahan Palmeriam, Kecamatan Matraman, Kota Jakarta Timur"},
-		{Id: uuid.New(), Name: "RT 19", Region: "RW 08, Kelurahan Palmeriam, Kecamatan Matraman, Kota Jakarta Timur"},
-		{Id: uuid.New(), Name: "RT 20", Region: "RW 08, Kelurahan Palmeriam, Kecamatan Matraman, Kota Jakarta Timur"},
+		{Id: uuid.New(), Name: "RT 12 / RW 08", Region: "Kelurahan Palmeriam, Kecamatan Matraman, Kota Jakarta Timur"},
+		{Id: uuid.New(), Name: "RT 13 / RW 08", Region: "Kelurahan Palmeriam, Kecamatan Matraman, Kota Jakarta Timur"},
+		{Id: uuid.New(), Name: "RT 18 / RW 08", Region: "Kelurahan Palmeriam, Kecamatan Matraman, Kota Jakarta Timur"},
+		{Id: uuid.New(), Name: "RT 19 / RW 08", Region: "Kelurahan Palmeriam, Kecamatan Matraman, Kota Jakarta Timur"},
+		{Id: uuid.New(), Name: "RT 20 / RW 08", Region: "Kelurahan Palmeriam, Kecamatan Matraman, Kota Jakarta Timur"},
 	}
 	for _, rt := range rts {
 		if err := db.Create(&rt).Error; err != nil {

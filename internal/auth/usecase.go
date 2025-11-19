@@ -37,7 +37,7 @@ func (us *useCase) Register(req RegisterRequest) (RegisterResponse, error) {
 		return RegisterResponse{}, err
 	}
 	if exist {
-		return RegisterResponse{}, errors.New("email atau NIK sudah terdaftar")
+		return RegisterResponse{}, errors.New("Email atau NIK sudah terdaftar")
 	}
 
 	rtUUID, err := uuid.Parse(req.RTId)
@@ -57,13 +57,15 @@ func (us *useCase) Register(req RegisterRequest) (RegisterResponse, error) {
 		NIK:      req.NIK,
 		RTId:     &rtUUID,
 	}
+	user.Id = uuid.New()
+
+	user.BaseModel.CreatedBy = &user.Id
 
 	if err := us.repo.CreateUser(&user); err != nil {
 		return RegisterResponse{}, errors.New("gagal register user")
 	}
 
 	return RegisterResponse{
-		UserID:  user.Id.String(),
 		Message: "Registrasi berhasil",
 	}, nil
 }
