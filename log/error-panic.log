@@ -1,0 +1,102 @@
+==============BEGIN ERROR 2025-11-22 23:13:43================
+Key "db" does not exist
+goroutine 50 [running]:
+runtime/debug.Stack()
+	C:/Users/arya/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.25.1.windows-amd64/src/runtime/debug/stack.go:26 +0x5e
+github/com/cl0ky/e-voting-be/server/router.SetupRoutes.RecoveryMiddleware.func4.1()
+	C:/Users/arya/Documents/SKRIPSI/e-voting-be/server/middleware/recovery.go:49 +0x3d
+panic({0x7ff60c91bf80?, 0xc0003ae150?})
+	C:/Users/arya/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.25.1.windows-amd64/src/runtime/panic.go:783 +0x132
+github.com/gin-gonic/gin.(*Context).MustGet(0xc0003aa060?, {0x7ff60ca847fb, 0x2})
+	C:/Users/arya/go/pkg/mod/github.com/gin-gonic/gin@v1.10.1/context.go:284 +0x68
+github/com/cl0ky/e-voting-be/server/router/auth_router.Init.AuthMiddleware.func1(0xc00042a000)
+	C:/Users/arya/Documents/SKRIPSI/e-voting-be/server/middleware/middleware.go:40 +0x1d5
+github.com/gin-gonic/gin.(*Context).Next(0xc00042a000)
+	C:/Users/arya/go/pkg/mod/github.com/gin-gonic/gin@v1.10.1/context.go:185 +0x2b
+github/com/cl0ky/e-voting-be/server/router.SetupRoutes.RecoveryMiddleware.func4(0x7ff60ca16e20?)
+	C:/Users/arya/Documents/SKRIPSI/e-voting-be/server/middleware/recovery.go:60 +0x3f
+github.com/gin-gonic/gin.(*Context).Next(...)
+	C:/Users/arya/go/pkg/mod/github.com/gin-gonic/gin@v1.10.1/context.go:185
+github/com/cl0ky/e-voting-be/server/middleware.corsMiddleware(0xc00042a000)
+	C:/Users/arya/Documents/SKRIPSI/e-voting-be/server/middleware/cors.go:45 +0x4fc
+github.com/gin-gonic/gin.(*Context).Next(...)
+	C:/Users/arya/go/pkg/mod/github.com/gin-gonic/gin@v1.10.1/context.go:185
+github.com/gin-gonic/gin.LoggerWithConfig.func1(0xc00042a000)
+	C:/Users/arya/go/pkg/mod/github.com/gin-gonic/gin@v1.10.1/logger.go:249 +0xe5
+github.com/gin-gonic/gin.(*Context).Next(0xc00042a000)
+	C:/Users/arya/go/pkg/mod/github.com/gin-gonic/gin@v1.10.1/context.go:185 +0x2b
+github/com/cl0ky/e-voting-be/server/router.SetupRoutes.ErrorHandler.func3(0xc00042a000)
+	C:/Users/arya/Documents/SKRIPSI/e-voting-be/server/middleware/error.go:23 +0x5e
+github.com/gin-gonic/gin.(*Context).Next(...)
+	C:/Users/arya/go/pkg/mod/github.com/gin-gonic/gin@v1.10.1/context.go:185
+github.com/gin-gonic/gin.CustomRecoveryWithWriter.func1(0xc00042a000)
+	C:/Users/arya/go/pkg/mod/github.com/gin-gonic/gin@v1.10.1/recovery.go:102 +0x6f
+github.com/gin-gonic/gin.(*Context).Next(...)
+	C:/Users/arya/go/pkg/mod/github.com/gin-gonic/gin@v1.10.1/context.go:185
+github.com/gin-gonic/gin.LoggerWithConfig.func1(0xc00042a000)
+	C:/Users/arya/go/pkg/mod/github.com/gin-gonic/gin@v1.10.1/logger.go:249 +0xe5
+github.com/gin-gonic/gin.(*Context).Next(...)
+	C:/Users/arya/go/pkg/mod/github.com/gin-gonic/gin@v1.10.1/context.go:185
+github.com/gin-gonic/gin.(*Engine).handleHTTPRequest(0xc0002c6000, 0xc00042a000)
+	C:/Users/arya/go/pkg/mod/github.com/gin-gonic/gin@v1.10.1/gin.go:644 +0x94b
+github.com/gin-gonic/gin.(*Engine).ServeHTTP(0xc0002c6000, {0x7ff60cc6e8c0, 0xc0001a00f0}, 0xc000186000)
+	C:/Users/arya/go/pkg/mod/github.com/gin-gonic/gin@v1.10.1/gin.go:600 +0x1ad
+net/http.serverHandler.ServeHTTP({0xc000210000?}, {0x7ff60cc6e8c0?, 0xc0001a00f0?}, 0x6?)
+	C:/Users/arya/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.25.1.windows-amd64/src/net/http/server.go:3340 +0x8e
+net/http.(*conn).serve(0xc0000bc510, {0x7ff60cc70138, 0xc00032b740})
+	C:/Users/arya/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.25.1.windows-amd64/src/net/http/server.go:2109 +0x665
+created by net/http.(*Server).Serve in goroutine 1
+	C:/Users/arya/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.25.1.windows-amd64/src/net/http/server.go:3493 +0x485
+
+=============================================================
+==============BEGIN ERROR 2025-11-22 23:13:53================
+Key "db" does not exist
+goroutine 50 [running]:
+runtime/debug.Stack()
+	C:/Users/arya/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.25.1.windows-amd64/src/runtime/debug/stack.go:26 +0x5e
+github/com/cl0ky/e-voting-be/server/router.SetupRoutes.RecoveryMiddleware.func4.1()
+	C:/Users/arya/Documents/SKRIPSI/e-voting-be/server/middleware/recovery.go:49 +0x3d
+panic({0x7ff60c91bf80?, 0xc0003aeae0?})
+	C:/Users/arya/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.25.1.windows-amd64/src/runtime/panic.go:783 +0x132
+github.com/gin-gonic/gin.(*Context).MustGet(0xc0003aa378?, {0x7ff60ca847fb, 0x2})
+	C:/Users/arya/go/pkg/mod/github.com/gin-gonic/gin@v1.10.1/context.go:284 +0x68
+github/com/cl0ky/e-voting-be/server/router/auth_router.Init.AuthMiddleware.func1(0xc00042a000)
+	C:/Users/arya/Documents/SKRIPSI/e-voting-be/server/middleware/middleware.go:40 +0x1d5
+github.com/gin-gonic/gin.(*Context).Next(0xc00042a000)
+	C:/Users/arya/go/pkg/mod/github.com/gin-gonic/gin@v1.10.1/context.go:185 +0x2b
+github/com/cl0ky/e-voting-be/server/router.SetupRoutes.RecoveryMiddleware.func4(0x7ff60ca16e20?)
+	C:/Users/arya/Documents/SKRIPSI/e-voting-be/server/middleware/recovery.go:60 +0x3f
+github.com/gin-gonic/gin.(*Context).Next(...)
+	C:/Users/arya/go/pkg/mod/github.com/gin-gonic/gin@v1.10.1/context.go:185
+github/com/cl0ky/e-voting-be/server/middleware.corsMiddleware(0xc00042a000)
+	C:/Users/arya/Documents/SKRIPSI/e-voting-be/server/middleware/cors.go:45 +0x4fc
+github.com/gin-gonic/gin.(*Context).Next(...)
+	C:/Users/arya/go/pkg/mod/github.com/gin-gonic/gin@v1.10.1/context.go:185
+github.com/gin-gonic/gin.LoggerWithConfig.func1(0xc00042a000)
+	C:/Users/arya/go/pkg/mod/github.com/gin-gonic/gin@v1.10.1/logger.go:249 +0xe5
+github.com/gin-gonic/gin.(*Context).Next(0xc00042a000)
+	C:/Users/arya/go/pkg/mod/github.com/gin-gonic/gin@v1.10.1/context.go:185 +0x2b
+github/com/cl0ky/e-voting-be/server/router.SetupRoutes.ErrorHandler.func3(0xc00042a000)
+	C:/Users/arya/Documents/SKRIPSI/e-voting-be/server/middleware/error.go:23 +0x5e
+github.com/gin-gonic/gin.(*Context).Next(...)
+	C:/Users/arya/go/pkg/mod/github.com/gin-gonic/gin@v1.10.1/context.go:185
+github.com/gin-gonic/gin.CustomRecoveryWithWriter.func1(0xc00042a000)
+	C:/Users/arya/go/pkg/mod/github.com/gin-gonic/gin@v1.10.1/recovery.go:102 +0x6f
+github.com/gin-gonic/gin.(*Context).Next(...)
+	C:/Users/arya/go/pkg/mod/github.com/gin-gonic/gin@v1.10.1/context.go:185
+github.com/gin-gonic/gin.LoggerWithConfig.func1(0xc00042a000)
+	C:/Users/arya/go/pkg/mod/github.com/gin-gonic/gin@v1.10.1/logger.go:249 +0xe5
+github.com/gin-gonic/gin.(*Context).Next(...)
+	C:/Users/arya/go/pkg/mod/github.com/gin-gonic/gin@v1.10.1/context.go:185
+github.com/gin-gonic/gin.(*Engine).handleHTTPRequest(0xc0002c6000, 0xc00042a000)
+	C:/Users/arya/go/pkg/mod/github.com/gin-gonic/gin@v1.10.1/gin.go:644 +0x94b
+github.com/gin-gonic/gin.(*Engine).ServeHTTP(0xc0002c6000, {0x7ff60cc6e8c0, 0xc0001a02d0}, 0xc000186280)
+	C:/Users/arya/go/pkg/mod/github.com/gin-gonic/gin@v1.10.1/gin.go:600 +0x1ad
+net/http.serverHandler.ServeHTTP({0xc000210000?}, {0x7ff60cc6e8c0?, 0xc0001a02d0?}, 0x6?)
+	C:/Users/arya/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.25.1.windows-amd64/src/net/http/server.go:3340 +0x8e
+net/http.(*conn).serve(0xc0000bc510, {0x7ff60cc70138, 0xc00032b740})
+	C:/Users/arya/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.25.1.windows-amd64/src/net/http/server.go:2109 +0x665
+created by net/http.(*Server).Serve in goroutine 1
+	C:/Users/arya/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.25.1.windows-amd64/src/net/http/server.go:3493 +0x485
+
+=============================================================

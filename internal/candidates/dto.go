@@ -1,6 +1,10 @@
 package candidates
 
-import "github.com/google/uuid"
+import (
+	"mime/multipart"
+
+	"github.com/google/uuid"
+)
 
 // DTOs for Candidate entity
 
@@ -15,12 +19,13 @@ type CandidateItem struct {
 }
 
 type CreateCandidateRequest struct {
-	Name       string     `json:"name" binding:"required,min=2"`
-	Vision     string     `json:"vision"`
-	Mission    string     `json:"mission"`
-	PhotoURL   string     `json:"photo_url"`
-	RTId       uuid.UUID  `json:"rt_id" binding:"required"`
-	ElectionId *uuid.UUID `json:"election_id"`
+	Name       string                `form:"name" binding:"required,min=2"`
+	Vision     string                `form:"vision"`
+	Mission    string                `form:"mission"`
+	Photo      *multipart.FileHeader `form:"photo"`
+	PhotoURL   string                `form:"-"`
+	RTId       *uuid.UUID            `form:"rt_id"`
+	ElectionId string                `form:"election_id"`
 }
 
 type UpdateCandidateRequest struct {
@@ -33,6 +38,11 @@ type UpdateCandidateRequest struct {
 }
 
 type CandidateListResponse struct {
+	Items []CandidateItem `json:"items"`
+	Total int64           `json:"total"`
+}
+
+type CandidateListByElectionResponse struct {
 	Items []CandidateItem `json:"items"`
 	Total int64           `json:"total"`
 }

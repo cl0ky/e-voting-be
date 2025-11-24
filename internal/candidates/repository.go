@@ -13,8 +13,15 @@ type Repository interface {
 	Create(ctx context.Context, c *models.Candidate) error
 	GetByID(ctx context.Context, id uuid.UUID) (*models.Candidate, error)
 	List(ctx context.Context, offset, limit int) ([]models.Candidate, int64, error)
+	ListByElectionID(ctx context.Context, electionId uuid.UUID) ([]models.Candidate, error)
 	Update(ctx context.Context, c *models.Candidate) error
 	Delete(ctx context.Context, id uuid.UUID, deletedBy *uuid.UUID) error
+}
+
+func (r *repository) ListByElectionID(ctx context.Context, electionId uuid.UUID) ([]models.Candidate, error) {
+	var items []models.Candidate
+	err := r.db.WithContext(ctx).Where("election_id = ?", electionId).Find(&items).Error
+	return items, err
 }
 
 type repository struct {

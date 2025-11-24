@@ -17,7 +17,7 @@ type Vote struct {
 	TxHashCommit string     `gorm:"type:varchar(128);column:tx_hash_commit"`
 	TxHashReveal string     `gorm:"type:varchar(128);column:tx_hash_reveal"`
 	IsRevealed   bool       `gorm:"type:boolean;default:false;column:is_revealed"`
-	RevealedAt   *time.Time `gorm:"type:timestamp(6);column:revealed_at"`
+	RevealedAt   *time.Time `gorm:"type:timestamptz;column:revealed_at"`
 
 	Voter     User       `gorm:"foreignKey:VoterId;references:Id;constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
 	Candidate *Candidate `gorm:"foreignKey:CandidateId;references:Id;constraint:OnUpdate:CASCADE,OnDelete:SET NULL"`

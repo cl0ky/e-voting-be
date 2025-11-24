@@ -8,9 +8,9 @@ import (
 )
 
 type BaseModel struct {
-	CreatedAt time.Time      `gorm:"type:timestamp(6);default:now();column:created_at"`
-	UpdatedAt time.Time      `gorm:"type:timestamp(6);default:now();column:updated_at"`
-	DeletedAt gorm.DeletedAt `gorm:"type:timestamp(6);column:deleted_at;index"`
+	CreatedAt time.Time      `gorm:"type:timestamptz;default:now();column:created_at"`
+	UpdatedAt time.Time      `gorm:"type:timestamptz;default:now();column:updated_at"`
+	DeletedAt gorm.DeletedAt `gorm:"type:timestamptz;column:deleted_at;index"`
 
 	CreatedBy *uuid.UUID `gorm:"type:uuid;column:created_by"`
 	UpdatedBy *uuid.UUID `gorm:"type:uuid;column:updated_by"`

@@ -14,10 +14,10 @@ func Init(rg *gin.RouterGroup, db *gorm.DB) {
 	ctrl := candidates.NewController(uc)
 
 	group := rg.Group("/candidates")
+	group.GET("/election/:election_id", ctrl.ListByElectionID)
 	group.GET("", ctrl.List)
 	group.GET("/:id", ctrl.GetByID)
 
-	// Protected write operations
 	group.Use(middleware.AuthMiddleware())
 	group.POST("", ctrl.Create)
 	group.PUT("/:id", ctrl.Update)

@@ -4,6 +4,7 @@ import (
 	"github/com/cl0ky/e-voting-be/server/middleware"
 	"github/com/cl0ky/e-voting-be/server/router/auth_router"
 	"github/com/cl0ky/e-voting-be/server/router/candidates_router"
+	"github/com/cl0ky/e-voting-be/server/router/election_router"
 	"github/com/cl0ky/e-voting-be/server/router/rts_router"
 	"net/http"
 
@@ -17,6 +18,10 @@ type SetupRoutesConfig struct {
 }
 
 func SetupRoutes(c SetupRoutesConfig) {
+	c.Router.Use(func(ctx *gin.Context) {
+		ctx.Set("db", c.DB)
+		ctx.Next()
+	})
 	c.Router.Use(middleware.ErrorHandler())
 	c.Router.Use(middleware.ReqLog())
 	c.Router.Use(middleware.CORSMiddleware())
@@ -37,4 +42,5 @@ func SetupRoutes(c SetupRoutesConfig) {
 
 	rts_router.Init(apiV1, c.DB)
 	candidates_router.Init(apiV1, c.DB)
+	election_router.Init(apiV1, c.DB)
 }
