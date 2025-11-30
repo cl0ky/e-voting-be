@@ -1,16 +1,26 @@
 package middleware
 
 import (
-	"net/http"
-	"strings"
-
 	env "github/com/cl0ky/e-voting-be/env"
 	"github/com/cl0ky/e-voting-be/internal/auth"
 	jwtutil "github/com/cl0ky/e-voting-be/pkg/jwt"
+	"net/http"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 )
+
+func RoleMiddleware(role string) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		userRole, exists := c.Get("role")
+		if !exists || userRole != role {
+			c.AbortWithStatusJSON(http.StatusForbidden, gin.H{"error": "forbidden: insufficient role"})
+			return
+		}
+		c.Next()
+	}
+}
 
 func AuthMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {

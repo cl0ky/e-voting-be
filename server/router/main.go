@@ -6,6 +6,7 @@ import (
 	"github/com/cl0ky/e-voting-be/server/router/candidates_router"
 	"github/com/cl0ky/e-voting-be/server/router/election_router"
 	"github/com/cl0ky/e-voting-be/server/router/rts_router"
+	"github/com/cl0ky/e-voting-be/server/router/votes_router"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -18,6 +19,7 @@ type SetupRoutesConfig struct {
 }
 
 func SetupRoutes(c SetupRoutesConfig) {
+	c.Router.Static("/uploads", "./uploads")
 	c.Router.Use(func(ctx *gin.Context) {
 		ctx.Set("db", c.DB)
 		ctx.Next()
@@ -43,4 +45,5 @@ func SetupRoutes(c SetupRoutesConfig) {
 	rts_router.Init(apiV1, c.DB)
 	candidates_router.Init(apiV1, c.DB)
 	election_router.Init(apiV1, c.DB)
+	votes_router.Init(apiV1, c.DB)
 }

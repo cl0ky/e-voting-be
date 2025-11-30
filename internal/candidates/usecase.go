@@ -136,8 +136,8 @@ func (u *useCase) Update(ctx context.Context, userID uuid.UUID, id uuid.UUID, re
 	if req.RTId != nil {
 		c.RTId = *req.RTId
 	}
-	if req.ElectionId != nil {
-		c.ElectionId = req.ElectionId
+	if req.ElectionUUID != nil {
+		c.ElectionId = req.ElectionUUID
 	}
 
 	c.BaseModel.UpdatedBy = &userID

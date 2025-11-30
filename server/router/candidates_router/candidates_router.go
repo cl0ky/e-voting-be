@@ -20,6 +20,6 @@ func Init(rg *gin.RouterGroup, db *gorm.DB) {
 
 	group.Use(middleware.AuthMiddleware())
 	group.POST("", ctrl.Create)
-	group.PUT("/:id", ctrl.Update)
+	group.PATCH("/:id", ctrl.Update)
 	group.DELETE("/:id", ctrl.Delete)
 }

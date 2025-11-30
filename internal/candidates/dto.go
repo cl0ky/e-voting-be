@@ -29,12 +29,14 @@ type CreateCandidateRequest struct {
 }
 
 type UpdateCandidateRequest struct {
-	Name       *string    `json:"name"`
-	Vision     *string    `json:"vision"`
-	Mission    *string    `json:"mission"`
-	PhotoURL   *string    `json:"photo_url"`
-	RTId       *uuid.UUID `json:"rt_id"`
-	ElectionId *uuid.UUID `json:"election_id"`
+	ElectionUUID *uuid.UUID            `json:"-"`
+	Name         *string               `form:"name"`
+	Vision       *string               `form:"vision"`
+	Mission      *string               `form:"mission"`
+	Photo        *multipart.FileHeader `form:"photo"`
+	PhotoURL     *string               `form:"-"`
+	RTId         *uuid.UUID            `form:"rt_id"`
+	ElectionId   string                `form:"election_id"`
 }
 
 type CandidateListResponse struct {
