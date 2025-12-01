@@ -100,3 +100,129 @@ created by net/http.(*Server).Serve in goroutine 1
 	C:/Users/arya/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.25.1.windows-amd64/src/net/http/server.go:3493 +0x485
 
 =============================================================
+==============BEGIN ERROR 2025-12-01 23:38:59================
+runtime error: invalid memory address or nil pointer dereference
+goroutine 25 [running]:
+runtime/debug.Stack()
+	C:/Users/arya/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.25.1.windows-amd64/src/runtime/debug/stack.go:26 +0x5e
+github/com/cl0ky/e-voting-be/server/router.SetupRoutes.RecoveryMiddleware.func5.1()
+	C:/Users/arya/Documents/SKRIPSI/e-voting-be/server/middleware/recovery.go:49 +0x3d
+panic({0x7ff63e1dfda0?, 0x7ff63edd5920?})
+	C:/Users/arya/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.25.1.windows-amd64/src/runtime/panic.go:783 +0x132
+github/com/cl0ky/e-voting-be/internal/election.(*useCase).FinalizeElection(0xc000047610, {0x7ff63e5d6360, 0xc00041c000}, {0xe5, 0x75, 0x1c, 0x69, 0x19, 0x6c, 0x4d, ...}, ...)
+	C:/Users/arya/Documents/SKRIPSI/e-voting-be/internal/election/usecase.go:219 +0xf6f
+github/com/cl0ky/e-voting-be/internal/election.(*controller).FinalizeElection(0xc000047620, 0xc000346000)
+	C:/Users/arya/Documents/SKRIPSI/e-voting-be/internal/election/controller.go:131 +0x2c5
+github.com/gin-gonic/gin.(*Context).Next(0xc000346000)
+	C:/Users/arya/go/pkg/mod/github.com/gin-gonic/gin@v1.10.1/context.go:185 +0x2b
+github/com/cl0ky/e-voting-be/server/router/election_router.Init.RoleMiddleware.func2(0xc000346000)
+	C:/Users/arya/Documents/SKRIPSI/e-voting-be/server/middleware/middleware.go:21 +0x69
+github.com/gin-gonic/gin.(*Context).Next(0xc000346000)
+	C:/Users/arya/go/pkg/mod/github.com/gin-gonic/gin@v1.10.1/context.go:185 +0x2b
+github/com/cl0ky/e-voting-be/server/router/election_router.Init.AuthMiddleware.func1(0xc000346000)
+	C:/Users/arya/Documents/SKRIPSI/e-voting-be/server/middleware/middleware.go:64 +0x325
+github.com/gin-gonic/gin.(*Context).Next(0xc000346000)
+	C:/Users/arya/go/pkg/mod/github.com/gin-gonic/gin@v1.10.1/context.go:185 +0x2b
+github/com/cl0ky/e-voting-be/server/router.SetupRoutes.RecoveryMiddleware.func5(0x7ff63e299e60?)
+	C:/Users/arya/Documents/SKRIPSI/e-voting-be/server/middleware/recovery.go:60 +0x3f
+github.com/gin-gonic/gin.(*Context).Next(...)
+	C:/Users/arya/go/pkg/mod/github.com/gin-gonic/gin@v1.10.1/context.go:185
+github/com/cl0ky/e-voting-be/server/middleware.corsMiddleware(0xc000346000)
+	C:/Users/arya/Documents/SKRIPSI/e-voting-be/server/middleware/cors.go:45 +0x4fc
+github.com/gin-gonic/gin.(*Context).Next(...)
+	C:/Users/arya/go/pkg/mod/github.com/gin-gonic/gin@v1.10.1/context.go:185
+github.com/gin-gonic/gin.LoggerWithConfig.func1(0xc000346000)
+	C:/Users/arya/go/pkg/mod/github.com/gin-gonic/gin@v1.10.1/logger.go:249 +0xe5
+github.com/gin-gonic/gin.(*Context).Next(0xc000346000)
+	C:/Users/arya/go/pkg/mod/github.com/gin-gonic/gin@v1.10.1/context.go:185 +0x2b
+github/com/cl0ky/e-voting-be/server/router.SetupRoutes.ErrorHandler.func4(0xc000346000)
+	C:/Users/arya/Documents/SKRIPSI/e-voting-be/server/middleware/error.go:23 +0x5e
+github.com/gin-gonic/gin.(*Context).Next(...)
+	C:/Users/arya/go/pkg/mod/github.com/gin-gonic/gin@v1.10.1/context.go:185
+github/com/cl0ky/e-voting-be/server/router.SetupRoutes.func1(0xc000346000)
+	C:/Users/arya/Documents/SKRIPSI/e-voting-be/server/router/main.go:25 +0x51
+github.com/gin-gonic/gin.(*Context).Next(...)
+	C:/Users/arya/go/pkg/mod/github.com/gin-gonic/gin@v1.10.1/context.go:185
+github.com/gin-gonic/gin.CustomRecoveryWithWriter.func1(0xc000346000)
+	C:/Users/arya/go/pkg/mod/github.com/gin-gonic/gin@v1.10.1/recovery.go:102 +0x6f
+github.com/gin-gonic/gin.(*Context).Next(...)
+	C:/Users/arya/go/pkg/mod/github.com/gin-gonic/gin@v1.10.1/context.go:185
+github.com/gin-gonic/gin.LoggerWithConfig.func1(0xc000346000)
+	C:/Users/arya/go/pkg/mod/github.com/gin-gonic/gin@v1.10.1/logger.go:249 +0xe5
+github.com/gin-gonic/gin.(*Context).Next(...)
+	C:/Users/arya/go/pkg/mod/github.com/gin-gonic/gin@v1.10.1/context.go:185
+github.com/gin-gonic/gin.(*Engine).handleHTTPRequest(0xc0002f81a0, 0xc000346000)
+	C:/Users/arya/go/pkg/mod/github.com/gin-gonic/gin@v1.10.1/gin.go:644 +0x94b
+github.com/gin-gonic/gin.(*Engine).ServeHTTP(0xc0002f81a0, {0x7ff63e5d4940, 0xc000340000}, 0xc000198640)
+	C:/Users/arya/go/pkg/mod/github.com/gin-gonic/gin@v1.10.1/gin.go:600 +0x1ad
+net/http.serverHandler.ServeHTTP({0xc000090fc0?}, {0x7ff63e5d4940?, 0xc000340000?}, 0x6?)
+	C:/Users/arya/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.25.1.windows-amd64/src/net/http/server.go:3340 +0x8e
+net/http.(*conn).serve(0xc0000c06c0, {0x7ff63e5d6328, 0xc000417890})
+	C:/Users/arya/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.25.1.windows-amd64/src/net/http/server.go:2109 +0x665
+created by net/http.(*Server).Serve in goroutine 1
+	C:/Users/arya/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.25.1.windows-amd64/src/net/http/server.go:3493 +0x485
+
+=============================================================
+==============BEGIN ERROR 2025-12-01 23:39:58================
+runtime error: invalid memory address or nil pointer dereference
+goroutine 25 [running]:
+runtime/debug.Stack()
+	C:/Users/arya/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.25.1.windows-amd64/src/runtime/debug/stack.go:26 +0x5e
+github/com/cl0ky/e-voting-be/server/router.SetupRoutes.RecoveryMiddleware.func5.1()
+	C:/Users/arya/Documents/SKRIPSI/e-voting-be/server/middleware/recovery.go:49 +0x3d
+panic({0x7ff63e1dfda0?, 0x7ff63edd5920?})
+	C:/Users/arya/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.25.1.windows-amd64/src/runtime/panic.go:783 +0x132
+github/com/cl0ky/e-voting-be/internal/election.(*useCase).FinalizeElection(0xc000047610, {0x7ff63e5d6360, 0xc00041c4b0}, {0xe5, 0x75, 0x1c, 0x69, 0x19, 0x6c, 0x4d, ...}, ...)
+	C:/Users/arya/Documents/SKRIPSI/e-voting-be/internal/election/usecase.go:219 +0xf6f
+github/com/cl0ky/e-voting-be/internal/election.(*controller).FinalizeElection(0xc000047620, 0xc000254100)
+	C:/Users/arya/Documents/SKRIPSI/e-voting-be/internal/election/controller.go:131 +0x2c5
+github.com/gin-gonic/gin.(*Context).Next(0xc000254100)
+	C:/Users/arya/go/pkg/mod/github.com/gin-gonic/gin@v1.10.1/context.go:185 +0x2b
+github/com/cl0ky/e-voting-be/server/router/election_router.Init.RoleMiddleware.func2(0xc000254100)
+	C:/Users/arya/Documents/SKRIPSI/e-voting-be/server/middleware/middleware.go:21 +0x69
+github.com/gin-gonic/gin.(*Context).Next(0xc000254100)
+	C:/Users/arya/go/pkg/mod/github.com/gin-gonic/gin@v1.10.1/context.go:185 +0x2b
+github/com/cl0ky/e-voting-be/server/router/election_router.Init.AuthMiddleware.func1(0xc000254100)
+	C:/Users/arya/Documents/SKRIPSI/e-voting-be/server/middleware/middleware.go:64 +0x325
+github.com/gin-gonic/gin.(*Context).Next(0xc000254100)
+	C:/Users/arya/go/pkg/mod/github.com/gin-gonic/gin@v1.10.1/context.go:185 +0x2b
+github/com/cl0ky/e-voting-be/server/router.SetupRoutes.RecoveryMiddleware.func5(0x7ff63e299e60?)
+	C:/Users/arya/Documents/SKRIPSI/e-voting-be/server/middleware/recovery.go:60 +0x3f
+github.com/gin-gonic/gin.(*Context).Next(...)
+	C:/Users/arya/go/pkg/mod/github.com/gin-gonic/gin@v1.10.1/context.go:185
+github/com/cl0ky/e-voting-be/server/middleware.corsMiddleware(0xc000254100)
+	C:/Users/arya/Documents/SKRIPSI/e-voting-be/server/middleware/cors.go:45 +0x4fc
+github.com/gin-gonic/gin.(*Context).Next(...)
+	C:/Users/arya/go/pkg/mod/github.com/gin-gonic/gin@v1.10.1/context.go:185
+github.com/gin-gonic/gin.LoggerWithConfig.func1(0xc000254100)
+	C:/Users/arya/go/pkg/mod/github.com/gin-gonic/gin@v1.10.1/logger.go:249 +0xe5
+github.com/gin-gonic/gin.(*Context).Next(0xc000254100)
+	C:/Users/arya/go/pkg/mod/github.com/gin-gonic/gin@v1.10.1/context.go:185 +0x2b
+github/com/cl0ky/e-voting-be/server/router.SetupRoutes.ErrorHandler.func4(0xc000254100)
+	C:/Users/arya/Documents/SKRIPSI/e-voting-be/server/middleware/error.go:23 +0x5e
+github.com/gin-gonic/gin.(*Context).Next(...)
+	C:/Users/arya/go/pkg/mod/github.com/gin-gonic/gin@v1.10.1/context.go:185
+github/com/cl0ky/e-voting-be/server/router.SetupRoutes.func1(0xc000254100)
+	C:/Users/arya/Documents/SKRIPSI/e-voting-be/server/router/main.go:25 +0x51
+github.com/gin-gonic/gin.(*Context).Next(...)
+	C:/Users/arya/go/pkg/mod/github.com/gin-gonic/gin@v1.10.1/context.go:185
+github.com/gin-gonic/gin.CustomRecoveryWithWriter.func1(0xc000254100)
+	C:/Users/arya/go/pkg/mod/github.com/gin-gonic/gin@v1.10.1/recovery.go:102 +0x6f
+github.com/gin-gonic/gin.(*Context).Next(...)
+	C:/Users/arya/go/pkg/mod/github.com/gin-gonic/gin@v1.10.1/context.go:185
+github.com/gin-gonic/gin.LoggerWithConfig.func1(0xc000254100)
+	C:/Users/arya/go/pkg/mod/github.com/gin-gonic/gin@v1.10.1/logger.go:249 +0xe5
+github.com/gin-gonic/gin.(*Context).Next(...)
+	C:/Users/arya/go/pkg/mod/github.com/gin-gonic/gin@v1.10.1/context.go:185
+github.com/gin-gonic/gin.(*Engine).handleHTTPRequest(0xc0002f81a0, 0xc000254100)
+	C:/Users/arya/go/pkg/mod/github.com/gin-gonic/gin@v1.10.1/gin.go:644 +0x94b
+github.com/gin-gonic/gin.(*Engine).ServeHTTP(0xc0002f81a0, {0x7ff63e5d4940, 0xc00040c2d0}, 0xc000198140)
+	C:/Users/arya/go/pkg/mod/github.com/gin-gonic/gin@v1.10.1/gin.go:600 +0x1ad
+net/http.serverHandler.ServeHTTP({0xc000090fc0?}, {0x7ff63e5d4940?, 0xc00040c2d0?}, 0x6?)
+	C:/Users/arya/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.25.1.windows-amd64/src/net/http/server.go:3340 +0x8e
+net/http.(*conn).serve(0xc0000c06c0, {0x7ff63e5d6328, 0xc000417890})
+	C:/Users/arya/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.25.1.windows-amd64/src/net/http/server.go:2109 +0x665
+created by net/http.(*Server).Serve in goroutine 1
+	C:/Users/arya/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.25.1.windows-amd64/src/net/http/server.go:3493 +0x485
+
+=============================================================

@@ -28,3 +28,25 @@ type CreateElectionRequest struct {
 type UpdateElectionStatusRequest struct {
 	Status string `json:"status" binding:"required"`
 }
+
+type FinalizeElectionRequest struct{}
+
+type FinalizeElectionResult struct {
+	CandidateId string `json:"candidate_id"`
+	Total       int    `json:"total"`
+}
+
+type FinalizeElectionResponse struct {
+	Summary          FinalizeElectionSummary `json:"summary"`
+	SummaryHash      string                  `json:"summary_hash"`
+	BlockchainTxHash string                  `json:"blockchain_tx_hash"`
+	Winner           string                  `json:"winner"`
+}
+
+type FinalizeElectionSummary struct {
+	ElectionId    string                   `json:"election_id"`
+	TotalRevealed int                      `json:"total_revealed"`
+	Results       []FinalizeElectionResult `json:"results"`
+	Winner        string                   `json:"winner"`
+	Timestamp     string                   `json:"timestamp"`
+}

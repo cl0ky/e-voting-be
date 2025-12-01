@@ -1,9 +1,9 @@
 package election
 
 import (
-	"net/http"
-
 	"github/com/cl0ky/e-voting-be/models"
+	"log"
+	"net/http"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
@@ -14,6 +14,7 @@ type ElectionController interface {
 	GetAll(c *gin.Context)
 	GetDetail(c *gin.Context)
 	UpdateStatus(c *gin.Context)
+	FinalizeElection(c *gin.Context)
 }
 
 type controller struct {
@@ -109,4 +110,31 @@ func (rc *controller) UpdateStatus(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusOK, item)
+}
+
+func (rc *controller) FinalizeElection(c *gin.Context) {
+	userVal, exists := c.Get("user")
+	if !exists {
+		c.JSON(401, gin.H{"error": "user tidak ditemukan di context"})
+		return
+	}
+	user, ok := userVal.(*models.User)
+	if !ok || user.Role != "admin" {
+		c.JSON(403, gin.H{"error": "hanya admin yang boleh finalize"})
+		return
+	}
+	idStr := c.Param("id")
+	log.Printf("[DEBUG] FinalizeElection controller id param: '%s'", idStr)
+	electionId, err := uuid.Parse(idStr)
+	if err != nil {
+		c.JSON(400, gin.H{"error": "invalid election id"})
+		return
+	}
+	log.Printf("[DEBUG] FinalizeElection controller parsed UUID: %s", electionId.String())
+	resp, err := rc.useCase.FinalizeElection(c.Request.Context(), electionId, user)
+	if err != nil {
+		c.JSON(400, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(200, resp)
 }

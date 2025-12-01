@@ -11,7 +11,7 @@ import (
 func Init(rg *gin.RouterGroup, db *gorm.DB) {
 	repo := candidates.NewRepository(db)
 	uc := candidates.NewUseCase(repo)
-	ctrl := candidates.NewController(uc)
+	ctrl := candidates.NewCandidateController(uc)
 
 	group := rg.Group("/candidates")
 	group.GET("/election/:election_id", ctrl.ListByElectionID)
