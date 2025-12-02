@@ -111,6 +111,9 @@ func SetBlockchainService(svc BlockchainService) {
 }
 
 func (u *useCase) FinalizeElection(ctx context.Context, electionId uuid.UUID, user *models.User) (*FinalizeElectionResponse, error) {
+	if blockchainService == nil {
+		return nil, fmt.Errorf("blockchain service not initialized")
+	}
 	log.Printf("[DEBUG] FinalizeElection usecase electionId: %s", electionId.String())
 	election, err := u.repo.GetElectionByID(ctx, electionId)
 	if err != nil {

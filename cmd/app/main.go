@@ -6,6 +6,7 @@ import (
 	"github/com/cl0ky/e-voting-be/config"
 	"github/com/cl0ky/e-voting-be/config/seed"
 	"github/com/cl0ky/e-voting-be/env"
+	"github/com/cl0ky/e-voting-be/internal/election"
 	"github/com/cl0ky/e-voting-be/server/router"
 	"log"
 	"net/http"
@@ -35,6 +36,15 @@ func main() {
 	if err := seed.SeedRT(db.Instance()); err != nil {
 		log.Fatalf("Gagal seeding RT: %v", err)
 	}
+
+	// Inisialisasi blockchain service (ISI PARAMETER SESUAI ENVIRONMENT ANDA)
+	blkSvc := &election.RealBlockchainService{
+		RPCUrl:        "http://localhost:8545", // GANTI: URL node blockchain
+		PrivateKeyHex: "0xYOUR_PRIVATE_KEY",    // GANTI: private key
+		ContractAddr:  "0xYOUR_CONTRACT_ADDR",  // GANTI: address contract
+		ContractABI:   "YOUR_CONTRACT_ABI",     // GANTI: ABI contract (string JSON)
+	}
+	election.SetBlockchainService(blkSvc)
 
 	router.SetupRoutes(router.SetupRoutesConfig{
 		Router: app,
