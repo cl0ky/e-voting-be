@@ -19,6 +19,12 @@ var (
 	DBName       string
 	DBString     string
 	JWTSecret    string
+
+	// Blockchain
+	RPCUrl       string
+	PrivateKey   string
+	ContractAddr string
+	ContractABI  string
 )
 
 func GetEnv() {
@@ -37,6 +43,12 @@ func GetEnv() {
 
 	// JWT Secret
 	JWTSecret = os.Getenv("JWT_SECRET")
+
+	// Blockchain
+	RPCUrl = os.Getenv("RPC_URL")
+	PrivateKey = os.Getenv("PRIVATE_KEY")
+	ContractAddr = os.Getenv("CONTRACT_ADDR")
+	ContractABI = os.Getenv("CONTRACT_ABI")
 }
 
 func parseToUint(val string, def ...uint64) uint64 {

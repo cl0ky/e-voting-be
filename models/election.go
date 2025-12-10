@@ -18,6 +18,7 @@ type Election struct {
 	SummaryHash      string         `gorm:"type:text;column:summary_hash"`
 	SummaryJSON      datatypes.JSON `gorm:"type:jsonb;column:summary_json"`
 	FinalizeStatus   string         `gorm:"type:varchar(20);default:'pending';column:finalize_status"`
+	FinalizeError    string         `gorm:"type:text;column:finalize_error"`
 	FinalizedAt      *time.Time     `gorm:"type:timestamptz;column:finalized_at"`
 
 	RTId uuid.UUID `gorm:"type:uuid;not null;column:rt_id"`

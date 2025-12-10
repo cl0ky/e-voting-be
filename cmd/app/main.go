@@ -37,12 +37,11 @@ func main() {
 		log.Fatalf("Gagal seeding RT: %v", err)
 	}
 
-	// Inisialisasi blockchain service (ISI PARAMETER SESUAI ENVIRONMENT ANDA)
 	blkSvc := &election.RealBlockchainService{
-		RPCUrl:        "http://localhost:8545", // GANTI: URL node blockchain
-		PrivateKeyHex: "0xYOUR_PRIVATE_KEY",    // GANTI: private key
-		ContractAddr:  "0xYOUR_CONTRACT_ADDR",  // GANTI: address contract
-		ContractABI:   "YOUR_CONTRACT_ABI",     // GANTI: ABI contract (string JSON)
+		RPCUrl:        env.RPCUrl,
+		PrivateKeyHex: env.PrivateKey,
+		ContractAddr:  env.ContractAddr,
+		ContractABI:   env.ContractABI,
 	}
 	election.SetBlockchainService(blkSvc)
 
