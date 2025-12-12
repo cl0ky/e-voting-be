@@ -17,6 +17,7 @@ type votesUseCase interface {
 	GetElectionStatus(ctx context.Context, rtId uuid.UUID, voterId uuid.UUID) (*ElectionStatusResponse, error)
 	CommitVote(ctx context.Context, voterId uuid.UUID, req CommitVoteRequest) error
 	RevealVote(ctx context.Context, voterId uuid.UUID, req RevealVoteRequest) error
+	GetUserVoteResults(ctx context.Context, voterId uuid.UUID) (*UserVoteResultsResponse, error)
 }
 
 func NewVotesController(useCase votesUseCase) *controller {
@@ -88,4 +89,24 @@ func (vc *controller) RevealVote(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{"message": "Vote revealed successfully"})
+}
+
+func (vc *controller) GetUserVoteResults(c *gin.Context) {
+	userVal, exists := c.Get("user")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "user tidak ditemukan di context"})
+		return
+	}
+	user, ok := userVal.(*models.User)
+	if !ok {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "user tidak valid"})
+		return
+	}
+
+	resp, err := vc.useCase.GetUserVoteResults(c.Request.Context(), user.Id)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, resp)
 }

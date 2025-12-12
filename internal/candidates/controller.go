@@ -1,10 +1,10 @@
 package candidates
 
 import (
-	"fmt"
 	"net/http"
 
 	"github/com/cl0ky/e-voting-be/models"
+	"github/com/cl0ky/e-voting-be/pkg/uploader"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
@@ -43,20 +43,20 @@ func (cc *candidateController) ListByElectionID(c *gin.Context) {
 }
 
 func (cc *candidateController) List(c *gin.Context) {
-	page := 1
-	pageSize := 20
-	if p := c.Query("page"); p != "" {
-		fmt.Sscanf(p, "%d", &page)
-	}
-	if ps := c.Query("page_size"); ps != "" {
-		fmt.Sscanf(ps, "%d", &pageSize)
-	}
-	resp, err := cc.useCase.List(c.Request.Context(), page, pageSize)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+	if electionIdStr := c.Query("election_id"); electionIdStr != "" {
+		electionId, err := uuid.Parse(electionIdStr)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "invalid election_id"})
+			return
+		}
+		resp, err := cc.useCase.ListByElectionID(c.Request.Context(), electionId)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+		c.JSON(http.StatusOK, resp)
 		return
 	}
-	c.JSON(http.StatusOK, resp)
 }
 
 func (cc *candidateController) GetByID(c *gin.Context) {
@@ -80,6 +80,17 @@ func (cc *candidateController) Create(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
+
+	// Handle photo upload if provided
+	if req.Photo != nil {
+		photoURL, err := uploader.Save(req.Photo, "uploads", "/uploads", "candidates")
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "gagal menyimpan foto kandidat"})
+			return
+		}
+		req.PhotoURL = photoURL
+	}
+
 	userVal, exists := c.Get("user")
 	if !exists {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "user tidak ditemukan di context"})
@@ -123,6 +134,17 @@ func (cc *candidateController) Update(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "user tidak valid"})
 		return
 	}
+
+	// Handle photo upload on update if provided
+	if req.Photo != nil {
+		photoURL, err := uploader.Save(req.Photo, "uploads", "/uploads", "candidates")
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "gagal menyimpan foto kandidat"})
+			return
+		}
+		req.PhotoURL = &photoURL
+	}
+
 	item, err := cc.useCase.Update(c.Request.Context(), user.Id, id, req)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})

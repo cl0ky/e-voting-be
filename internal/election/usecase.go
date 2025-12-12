@@ -1,6 +1,7 @@
 package election
 
 import (
+	"bytes"
 	"context"
 	"crypto/sha256"
 	"encoding/hex"
@@ -21,6 +22,7 @@ type UseCase interface {
 	GetById(ctx context.Context, id uuid.UUID) (*ElectionItem, error)
 	UpdateStatus(ctx context.Context, id uuid.UUID, status string) error
 	FinalizeElection(ctx context.Context, electionId uuid.UUID, user *models.User) (*FinalizeElectionResponse, error)
+	VerifyElectionResult(ctx context.Context, electionId uuid.UUID) (*VerifyElectionResultResponse, error)
 }
 
 type useCase struct {
@@ -101,7 +103,8 @@ func (u *useCase) UpdateStatus(ctx context.Context, id uuid.UUID, status string)
 }
 
 type BlockchainService interface {
-	StoreResultHash(hash string) (string, error)
+	StoreResultHash(electionId string, hash string) (string, error)
+	GetHash(electionId string) (string, error)
 }
 
 var blockchainService BlockchainService
@@ -172,7 +175,7 @@ func (u *useCase) FinalizeElection(ctx context.Context, electionId uuid.UUID, us
 	for _, cid := range candidateIDs {
 		total := counts[cid]
 		results = append(results, resultItem{CandidateId: cid, Votes: total})
-		if total > maxVote || (total == maxVote && cid < winner) {
+		if total > maxVote || (total == maxVote && (winner == "" || cid < winner)) {
 			winner = cid
 			maxVote = total
 		}
@@ -182,38 +185,7 @@ func (u *useCase) FinalizeElection(ctx context.Context, electionId uuid.UUID, us
 		maxVote = 0
 	}
 
-	summary := map[string]interface{}{
-		"election_id":    electionId.String(),
-		"total_revealed": len(votes),
-		"results":        results,
-		"winner":         winner,
-		"timestamp":      time.Now().UTC().Format(time.RFC3339),
-	}
-
-	summaryJSON, err := json.Marshal(summary)
-	if err != nil {
-		_ = u.repo.SetElectionFinalizeFailed(ctx, electionId, "marshal summary error: "+err.Error())
-		return nil, fmt.Errorf("failed to marshal summary: %w", err)
-	}
-
-	hashBytes := sha256.Sum256(summaryJSON)
-	summaryHash := "0x" + hex.EncodeToString(hashBytes[:])
-
-	if err := u.repo.UpdateElectionSummaryAndStatus(ctx, electionId, datatypes.JSON(summaryJSON), summaryHash); err != nil {
-		_ = u.repo.SetElectionFinalizeFailed(ctx, electionId, "db update error: "+err.Error())
-		return nil, fmt.Errorf("failed to update election summary: %w", err)
-	}
-
-	txHash, err := blockchainService.StoreResultHash(summaryHash)
-	if err != nil {
-		_ = u.repo.SetElectionFinalizeFailed(ctx, electionId, "blockchain error: "+err.Error())
-		return nil, fmt.Errorf("blockchain error: %w", err)
-	}
-
-	if err := u.repo.UpdateElectionFinalizeResult(ctx, electionId, txHash); err != nil {
-		return nil, fmt.Errorf("failed to finalize el ction: %w", err)
-	}
-
+	timestamp := time.Now().UTC().Format(time.RFC3339)
 	var finalizeResults []FinalizeElectionResult
 	for _, r := range results {
 		finalizeResults = append(finalizeResults, FinalizeElectionResult{
@@ -221,17 +193,123 @@ func (u *useCase) FinalizeElection(ctx context.Context, electionId uuid.UUID, us
 			Total:       r.Votes,
 		})
 	}
-	responseSummary := FinalizeElectionSummary{
+
+	summary := FinalizeElectionSummary{
 		ElectionId:    electionId.String(),
 		TotalRevealed: len(votes),
 		Results:       finalizeResults,
 		Winner:        winner,
-		Timestamp:     summary["timestamp"].(string),
+		Timestamp:     timestamp,
 	}
+
+	buf := &bytes.Buffer{}
+	enc := json.NewEncoder(buf)
+	enc.SetEscapeHTML(false)
+
+	if err := enc.Encode(summary); err != nil {
+		_ = u.repo.SetElectionFinalizeFailed(ctx, electionId, "marshal summary error: "+err.Error())
+		return nil, fmt.Errorf("failed to marshal summary: %w", err)
+	}
+
+	summaryJSONBytes := buf.Bytes()
+	if len(summaryJSONBytes) > 0 && summaryJSONBytes[len(summaryJSONBytes)-1] == '\n' {
+		summaryJSONBytes = summaryJSONBytes[:len(summaryJSONBytes)-1]
+	}
+
+	hashBytes := sha256.Sum256(summaryJSONBytes)
+	summaryHash := "0x" + hex.EncodeToString(hashBytes[:])
+
+	if err := u.repo.UpdateElectionSummaryAndStatus(ctx, electionId, datatypes.JSON(summaryJSONBytes), summaryHash); err != nil {
+		_ = u.repo.SetElectionFinalizeFailed(ctx, electionId, "db update error: "+err.Error())
+		return nil, fmt.Errorf("failed to update election summary: %w", err)
+	}
+
+	txHash, err := blockchainService.StoreResultHash(electionId.String(), summaryHash)
+
+	if err != nil {
+		_ = u.repo.SetElectionFinalizeFailed(ctx, electionId, "blockchain error: "+err.Error())
+		return nil, fmt.Errorf("blockchain error: %w", err)
+	}
+	if err := u.repo.UpdateElectionFinalizeResult(ctx, electionId, txHash); err != nil {
+		return nil, fmt.Errorf("failed to finalize election: %w", err)
+	}
+	responseSummary := summary
 	return &FinalizeElectionResponse{
 		Summary:          responseSummary,
 		SummaryHash:      summaryHash,
 		BlockchainTxHash: txHash,
 		Winner:           winner,
 	}, nil
+}
+
+func (u *useCase) VerifyElectionResult(ctx context.Context, electionId uuid.UUID) (*VerifyElectionResultResponse, error) {
+	election, err := u.repo.GetElectionByID(ctx, electionId)
+	if err != nil {
+		return nil, fmt.Errorf("election not found")
+	}
+
+	dbHash := election.SummaryHash
+	blockchainTxHash := election.BlockchainTxHash
+	summaryJSON := election.SummaryJSON
+
+	var summaryBytes []byte
+	if summaryJSON != nil && len(summaryJSON) > 0 {
+		var summaryStruct FinalizeElectionSummary
+		if err := json.Unmarshal([]byte(summaryJSON), &summaryStruct); err != nil {
+			log.Printf("[VERIFY] warning: unable to unmarshal summary json: %v", err)
+			summaryBytes = []byte(summaryJSON)
+		} else {
+			buf := &bytes.Buffer{}
+			enc := json.NewEncoder(buf)
+			enc.SetEscapeHTML(false)
+			if err := enc.Encode(summaryStruct); err != nil {
+				log.Printf("[VERIFY] warning: unable to encode canonical summary: %v", err)
+				summaryBytes = []byte(summaryJSON)
+			} else {
+				b := buf.Bytes()
+				if len(b) > 0 && b[len(b)-1] == '\n' {
+					b = b[:len(b)-1]
+				}
+				summaryBytes = b
+			}
+		}
+	} else {
+		summaryBytes = []byte{}
+	}
+
+	hashBytes := sha256.Sum256(summaryBytes)
+	localHash := "0x" + hex.EncodeToString(hashBytes[:])
+
+	log.Printf("[VERIFY] canonical_summary_json: %s", string(summaryBytes))
+	log.Printf("[VERIFY] localHash: %s", localHash)
+	log.Printf("[VERIFY] dbHash: %s", dbHash)
+
+	blockchainHash := ""
+	if blockchainService != nil {
+		blockchainHash, err = blockchainService.GetHash(electionId.String())
+		if err != nil {
+			blockchainHash = ""
+		}
+	}
+	log.Printf("[VERIFY] blockchainHash: %s", blockchainHash)
+
+	valid := (localHash == dbHash) && (dbHash == blockchainHash)
+
+	if valid {
+		return &VerifyElectionResultResponse{
+			LocalHash:        localHash,
+			DBHash:           dbHash,
+			BlockchainHash:   blockchainHash,
+			BlockchainTxHash: blockchainTxHash,
+			Valid:            true,
+		}, nil
+	} else {
+		return &VerifyElectionResultResponse{
+			LocalHash:      localHash,
+			DBHash:         dbHash,
+			BlockchainHash: blockchainHash,
+			Valid:          false,
+			Message:        "Hash mismatch: database or blockchain data has been modified.",
+		}, nil
+	}
 }

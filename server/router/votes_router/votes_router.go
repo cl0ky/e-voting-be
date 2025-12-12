@@ -18,5 +18,6 @@ func Init(rg *gin.RouterGroup, db *gorm.DB) {
 	group.Use(middleware.AuthMiddleware(), middleware.RoleMiddleware("Voter"))
 	group.POST("/commit", ctrl.CommitVote)
 	group.GET("/election-status", ctrl.GetElectionStatus)
+	group.GET("/results", ctrl.GetUserVoteResults)
 	group.POST("/reveal", ctrl.RevealVote)
 }

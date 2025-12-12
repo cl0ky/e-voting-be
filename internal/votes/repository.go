@@ -15,6 +15,7 @@ type Repository interface {
 	CreateVoteCommit(ctx context.Context, voterId uuid.UUID, electionId uuid.UUID, hashVote string) error
 	RevealVote(ctx context.Context, voterId uuid.UUID, electionId uuid.UUID, candidateId uuid.UUID, nonce string) error
 	GetVoteByVoterAndElection(ctx context.Context, electionId uuid.UUID, voterId uuid.UUID) (*models.Vote, error)
+	ListVotesByVoter(ctx context.Context, voterId uuid.UUID) ([]models.Vote, error)
 }
 
 type repository struct {
@@ -92,4 +93,18 @@ func (r *repository) GetVoteByVoterAndElection(ctx context.Context, electionId u
 		return nil, err
 	}
 	return &vote, nil
+}
+
+func (r *repository) ListVotesByVoter(ctx context.Context, voterId uuid.UUID) ([]models.Vote, error) {
+	var votes []models.Vote
+	err := r.db.WithContext(ctx).
+		Preload("Election").
+		Preload("Candidate").
+		Where("voter_id = ?", voterId).
+		Order("created_at DESC").
+		Find(&votes).Error
+	if err != nil {
+		return nil, err
+	}
+	return votes, nil
 }

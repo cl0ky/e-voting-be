@@ -5,6 +5,7 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"fmt"
+	"time"
 
 	"github.com/google/uuid"
 )
@@ -13,6 +14,7 @@ type UseCase interface {
 	GetElectionStatus(ctx context.Context, rtId uuid.UUID, voterId uuid.UUID) (*ElectionStatusResponse, error)
 	CommitVote(ctx context.Context, voterId uuid.UUID, req CommitVoteRequest) error
 	RevealVote(ctx context.Context, voterId uuid.UUID, req RevealVoteRequest) error
+	GetUserVoteResults(ctx context.Context, voterId uuid.UUID) (*UserVoteResultsResponse, error)
 }
 
 type useCase struct {
@@ -37,6 +39,24 @@ type ElectionStatusItem struct {
 	EndDate   string    `json:"end_date"`
 }
 
+type UserVoteResultItem struct {
+	ElectionId     uuid.UUID  `json:"election_id"`
+	ElectionName   string     `json:"election_name"`
+	ElectionStatus string     `json:"election_status"`
+	StartAt        time.Time  `json:"start_at"`
+	EndAt          time.Time  `json:"end_at"`
+	HasCommitted   bool       `json:"hasCommitted"`
+	HasRevealed    bool       `json:"hasRevealed"`
+	CandidateId    *uuid.UUID `json:"candidate_id,omitempty"`
+	CandidateName  *string    `json:"candidate_name,omitempty"`
+	RevealedAt     *time.Time `json:"revealed_at,omitempty"`
+}
+
+type UserVoteResultsResponse struct {
+	Items []UserVoteResultItem `json:"items"`
+	Total int64                `json:"total"`
+}
+
 func (u *useCase) GetElectionStatus(ctx context.Context, rtId uuid.UUID, voterId uuid.UUID) (*ElectionStatusResponse, error) {
 	election, err := u.repo.GetActiveElectionForVoter(ctx, rtId, voterId)
 	if err == nil && election != nil {
@@ -46,8 +66,8 @@ func (u *useCase) GetElectionStatus(ctx context.Context, rtId uuid.UUID, voterId
 				Id:        election.Id,
 				Name:      election.Name,
 				Status:    election.Status,
-				StartDate: election.StartAt.Format("2006-01-02"),
-				EndDate:   election.EndAt.Format("2006-01-02"),
+				StartDate: election.StartAt.Format(time.RFC3339),
+				EndDate:   election.EndAt.Format(time.RFC3339),
 			},
 			HasCommitted: hasCommitted,
 			HasRevealed:  hasRevealed,
@@ -62,8 +82,8 @@ func (u *useCase) GetElectionStatus(ctx context.Context, rtId uuid.UUID, voterId
 				Id:        committedElection.Id,
 				Name:      committedElection.Name,
 				Status:    committedElection.Status,
-				StartDate: committedElection.StartAt.Format("2006-01-02"),
-				EndDate:   committedElection.EndAt.Format("2006-01-02"),
+				StartDate: committedElection.StartAt.Format(time.RFC3339),
+				EndDate:   committedElection.EndAt.Format(time.RFC3339),
 			},
 			HasCommitted: hasCommitted,
 			HasRevealed:  hasRevealed,
@@ -107,6 +127,41 @@ func (u *useCase) RevealVote(ctx context.Context, voterId uuid.UUID, req RevealV
 		return fmt.Errorf("hash verification failed: invalid candidate_id or nonce")
 	}
 	return u.repo.RevealVote(ctx, voterId, electionId, candidateId, req.Nonce)
+}
+
+func (u *useCase) GetUserVoteResults(ctx context.Context, voterId uuid.UUID) (*UserVoteResultsResponse, error) {
+	votes, err := u.repo.ListVotesByVoter(ctx, voterId)
+	if err != nil {
+		return nil, err
+	}
+
+	items := make([]UserVoteResultItem, 0, len(votes))
+	for _, v := range votes {
+		candidateName := (*string)(nil)
+		if v.Candidate != nil {
+			name := v.Candidate.Name
+			candidateName = &name
+		}
+
+		item := UserVoteResultItem{
+			ElectionId:     v.Election.Id,
+			ElectionName:   v.Election.Name,
+			ElectionStatus: v.Election.Status,
+			StartAt:        v.Election.StartAt,
+			EndAt:          v.Election.EndAt,
+			HasCommitted:   v.HashVote != "",
+			HasRevealed:    v.IsRevealed,
+			CandidateId:    v.RevealedCandidateId,
+			CandidateName:  candidateName,
+			RevealedAt:     v.RevealedAt,
+		}
+		items = append(items, item)
+	}
+
+	return &UserVoteResultsResponse{
+		Items: items,
+		Total: int64(len(items)),
+	}, nil
 }
 
 func computeVoteHash(candidateId string, nonce string) string {

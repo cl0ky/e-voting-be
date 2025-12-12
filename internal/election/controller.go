@@ -15,6 +15,7 @@ type ElectionController interface {
 	GetDetail(c *gin.Context)
 	UpdateStatus(c *gin.Context)
 	FinalizeElection(c *gin.Context)
+	VerifyElectionResult(c *gin.Context)
 }
 
 type controller struct {
@@ -137,4 +138,19 @@ func (rc *controller) FinalizeElection(c *gin.Context) {
 		return
 	}
 	c.JSON(200, resp)
+}
+
+func (rc *controller) VerifyElectionResult(c *gin.Context) {
+	idStr := c.Param("id")
+	electionId, err := uuid.Parse(idStr)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid election id"})
+		return
+	}
+	resp, err := rc.useCase.VerifyElectionResult(c.Request.Context(), electionId)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, resp)
 }

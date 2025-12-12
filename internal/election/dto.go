@@ -50,3 +50,12 @@ type FinalizeElectionSummary struct {
 	Winner        string                   `json:"winner"`
 	Timestamp     string                   `json:"timestamp"`
 }
+
+type VerifyElectionResultResponse struct {
+	LocalHash        string `json:"local_hash"`
+	DBHash           string `json:"db_hash"`
+	BlockchainHash   string `json:"blockchain_hash"`
+	BlockchainTxHash string `json:"blockchain_tx_hash,omitempty"`
+	Valid            bool   `json:"valid"`
+	Message          string `json:"message,omitempty"`
+}
