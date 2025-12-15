@@ -23,6 +23,8 @@ type Repository interface {
 	UpdateElectionSummaryAndStatus(ctx context.Context, electionId uuid.UUID, summary datatypes.JSON, summaryHash string) error
 	UpdateElectionFinalizeResult(ctx context.Context, electionId uuid.UUID, blockchainTxHash string) error
 	GetCandidatesByIDs(ctx context.Context, ids []uuid.UUID) ([]models.Candidate, error)
+	GetDashboardStatsByRT(ctx context.Context, rtId uuid.UUID) (total int64, active int64, unfinalized int64, err error)
+	GetRecentElectionsByRT(ctx context.Context, rtId uuid.UUID, limit int) ([]models.Election, error)
 }
 
 type repository struct {
@@ -132,4 +134,44 @@ func (r *repository) GetCandidatesByIDs(ctx context.Context, ids []uuid.UUID) ([
 		return nil, err
 	}
 	return candidates, nil
+}
+
+func (r *repository) GetDashboardStatsByRT(ctx context.Context, rtId uuid.UUID) (int64, int64, int64, error) {
+	var total, active, unfinalized int64
+
+	if err := r.db.WithContext(ctx).
+		Model(&models.Election{}).
+		Where("rt_id = ?", rtId).
+		Count(&total).Error; err != nil {
+		return 0, 0, 0, err
+	}
+
+	if err := r.db.WithContext(ctx).
+		Model(&models.Election{}).
+		Where("rt_id = ? AND status = ?", rtId, "active").
+		Count(&active).Error; err != nil {
+		return 0, 0, 0, err
+	}
+
+	if err := r.db.WithContext(ctx).
+		Model(&models.Election{}).
+		Where("rt_id = ? AND (finalize_status IS NULL OR finalize_status <> ?)", rtId, "success").
+		Count(&unfinalized).Error; err != nil {
+		return 0, 0, 0, err
+	}
+
+	return total, active, unfinalized, nil
+}
+
+func (r *repository) GetRecentElectionsByRT(ctx context.Context, rtId uuid.UUID, limit int) ([]models.Election, error) {
+	var elections []models.Election
+	if limit <= 0 {
+		limit = 3
+	}
+	err := r.db.WithContext(ctx).
+		Where("rt_id = ?", rtId).
+		Order("start_at DESC").
+		Limit(limit).
+		Find(&elections).Error
+	return elections, err
 }

@@ -24,6 +24,7 @@ type UseCase interface {
 	UpdateStatus(ctx context.Context, id uuid.UUID, status string) error
 	FinalizeElection(ctx context.Context, electionId uuid.UUID, user *models.User) (*FinalizeElectionResponse, error)
 	VerifyElectionResult(ctx context.Context, electionId uuid.UUID) (*VerifyElectionResultResponse, error)
+	GetAdminDashboard(ctx context.Context, rtId uuid.UUID) (*AdminDashboardResponse, error)
 }
 
 type useCase struct {
@@ -169,6 +170,38 @@ func (u *useCase) GetDetail(ctx context.Context, id uuid.UUID) (*ElectionDetailR
 		}
 	}
 
+	return resp, nil
+}
+
+func (u *useCase) GetAdminDashboard(ctx context.Context, rtId uuid.UUID) (*AdminDashboardResponse, error) {
+	total, active, unfinalized, err := u.repo.GetDashboardStatsByRT(ctx, rtId)
+	if err != nil {
+		return nil, err
+	}
+
+	recentModels, err := u.repo.GetRecentElectionsByRT(ctx, rtId, 3)
+	if err != nil {
+		return nil, err
+	}
+
+	recent := make([]AdminDashboardRecentElection, 0, len(recentModels))
+	for _, e := range recentModels {
+		recent = append(recent, AdminDashboardRecentElection{
+			ElectionId:     e.Id,
+			Name:           e.Name,
+			Status:         e.Status,
+			FinalizeStatus: e.FinalizeStatus,
+		})
+	}
+
+	resp := &AdminDashboardResponse{
+		Summary: AdminDashboardSummary{
+			TotalElections:       total,
+			ActiveElections:      active,
+			UnfinalizedElections: unfinalized,
+		},
+		RecentElections: recent,
+	}
 	return resp, nil
 }
 

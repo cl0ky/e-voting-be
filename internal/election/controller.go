@@ -16,6 +16,7 @@ type ElectionController interface {
 	UpdateStatus(c *gin.Context)
 	FinalizeElection(c *gin.Context)
 	VerifyElectionResult(c *gin.Context)
+	GetAdminDashboard(c *gin.Context)
 }
 
 type controller struct {
@@ -148,6 +149,26 @@ func (rc *controller) VerifyElectionResult(c *gin.Context) {
 		return
 	}
 	resp, err := rc.useCase.VerifyElectionResult(c.Request.Context(), electionId)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, resp)
+}
+
+func (rc *controller) GetAdminDashboard(c *gin.Context) {
+	userVal, exists := c.Get("user")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "user tidak ditemukan di context"})
+		return
+	}
+	user, ok := userVal.(*models.User)
+	if !ok || user.RTId == nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "RT user tidak ditemukan"})
+		return
+	}
+
+	resp, err := rc.useCase.GetAdminDashboard(c.Request.Context(), *user.RTId)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return

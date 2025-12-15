@@ -82,3 +82,21 @@ type ElectionDetailResponse struct {
 	Results        []ElectionResultItem `json:"results"`
 	TotalVotes     int                  `json:"total_votes"`
 }
+
+type AdminDashboardSummary struct {
+	TotalElections       int64 `json:"total_elections"`
+	ActiveElections      int64 `json:"active_elections"`
+	UnfinalizedElections int64 `json:"unfinalized_elections"`
+}
+
+type AdminDashboardRecentElection struct {
+	ElectionId     uuid.UUID `json:"election_id"`
+	Name           string    `json:"name"`
+	Status         string    `json:"status"`
+	FinalizeStatus string    `json:"finalize_status"`
+}
+
+type AdminDashboardResponse struct {
+	Summary         AdminDashboardSummary          `json:"summary"`
+	RecentElections []AdminDashboardRecentElection `json:"recent_elections"`
+}
