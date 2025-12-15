@@ -69,7 +69,7 @@ func (rc *controller) GetAll(c *gin.Context) {
 		c.JSON(500, gin.H{"error": err.Error()})
 		return
 	}
-	c.JSON(200, items)
+	c.JSON(200, gin.H{"data": items})
 }
 
 func (rc *controller) GetDetail(c *gin.Context) {
@@ -79,7 +79,7 @@ func (rc *controller) GetDetail(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid id"})
 		return
 	}
-	item, err := rc.useCase.GetById(c.Request.Context(), id)
+	item, err := rc.useCase.GetDetail(c.Request.Context(), id)
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "not found"})
 		return

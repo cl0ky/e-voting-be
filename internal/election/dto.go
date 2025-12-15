@@ -7,13 +7,15 @@ import (
 )
 
 type ElectionItem struct {
-	Id      uuid.UUID `json:"id"`
-	Name    string    `json:"name"`
-	StartAt time.Time `json:"start_at"`
-	EndAt   time.Time `json:"end_at"`
-	Status  string    `json:"status"`
-	RTId    uuid.UUID `json:"rt_id"`
-	Year    int       `json:"year"`
+	Id             uuid.UUID  `json:"election_id"`
+	Name           string     `json:"name"`
+	Status         string     `json:"status"`
+	FinalizeStatus string     `json:"finalize_status"`
+	StartAt        time.Time  `json:"start_at"`
+	EndAt          time.Time  `json:"end_at"`
+	FinalizedAt    *time.Time `json:"finalized_at"`
+	RTId           uuid.UUID  `json:"-"`
+	Year           int        `json:"-"`
 }
 
 type CreateElectionRequest struct {
@@ -58,4 +60,25 @@ type VerifyElectionResultResponse struct {
 	BlockchainTxHash string `json:"blockchain_tx_hash,omitempty"`
 	Valid            bool   `json:"valid"`
 	Message          string `json:"message,omitempty"`
+}
+
+type ElectionResultItem struct {
+	CandidateId   string `json:"candidate_id"`
+	CandidateName string `json:"candidate_name"`
+	PhotoURL      string `json:"photo_url"`
+	Votes         int    `json:"votes"`
+}
+
+type ElectionDetailResponse struct {
+	ElectionId     uuid.UUID            `json:"election_id"`
+	Name           string               `json:"name"`
+	Status         string               `json:"status"`
+	FinalizeStatus string               `json:"finalize_status"`
+	StartAt        time.Time            `json:"start_at"`
+	EndAt          time.Time            `json:"end_at"`
+	FinalizedAt    *time.Time           `json:"finalized_at"`
+	SummaryHash    string               `json:"summary_hash,omitempty"`
+	BlockchainTx   string               `json:"blockchain_tx_hash,omitempty"`
+	Results        []ElectionResultItem `json:"results"`
+	TotalVotes     int                  `json:"total_votes"`
 }

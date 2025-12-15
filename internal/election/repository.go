@@ -22,6 +22,7 @@ type Repository interface {
 	SetElectionFinalizeFailed(ctx context.Context, electionId uuid.UUID, reason string) error
 	UpdateElectionSummaryAndStatus(ctx context.Context, electionId uuid.UUID, summary datatypes.JSON, summaryHash string) error
 	UpdateElectionFinalizeResult(ctx context.Context, electionId uuid.UUID, blockchainTxHash string) error
+	GetCandidatesByIDs(ctx context.Context, ids []uuid.UUID) ([]models.Candidate, error)
 }
 
 type repository struct {
@@ -117,4 +118,18 @@ func (r *repository) UpdateElectionFinalizeResult(ctx context.Context, electionI
 			"finalize_status":    "success",
 			"status":             "finalized",
 		}).Error
+}
+
+func (r *repository) GetCandidatesByIDs(ctx context.Context, ids []uuid.UUID) ([]models.Candidate, error) {
+	var candidates []models.Candidate
+	if len(ids) == 0 {
+		return candidates, nil
+	}
+	err := r.db.WithContext(ctx).
+		Where("id IN ?", ids).
+		Find(&candidates).Error
+	if err != nil {
+		return nil, err
+	}
+	return candidates, nil
 }

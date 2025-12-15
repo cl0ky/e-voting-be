@@ -20,6 +20,7 @@ type UseCase interface {
 	Create(ctx context.Context, req CreateElectionRequest) (*ElectionItem, error)
 	GetAllByRTId(ctx context.Context, rtId uuid.UUID) ([]ElectionItem, error)
 	GetById(ctx context.Context, id uuid.UUID) (*ElectionItem, error)
+	GetDetail(ctx context.Context, id uuid.UUID) (*ElectionDetailResponse, error)
 	UpdateStatus(ctx context.Context, id uuid.UUID, status string) error
 	FinalizeElection(ctx context.Context, electionId uuid.UUID, user *models.User) (*FinalizeElectionResponse, error)
 	VerifyElectionResult(ctx context.Context, electionId uuid.UUID) (*VerifyElectionResultResponse, error)
@@ -49,12 +50,14 @@ func (u *useCase) Create(ctx context.Context, req CreateElectionRequest) (*Elect
 		return nil, err
 	}
 	item := ElectionItem{
-		Id:      e.Id,
-		Name:    e.Name,
-		StartAt: e.StartAt,
-		EndAt:   e.EndAt,
-		Status:  e.Status,
-		RTId:    e.RTId,
+		Id:             e.Id,
+		Name:           e.Name,
+		Status:         e.Status,
+		FinalizeStatus: e.FinalizeStatus,
+		StartAt:        e.StartAt,
+		EndAt:          e.EndAt,
+		FinalizedAt:    e.FinalizedAt,
+		RTId:           e.RTId,
 	}
 	return &item, nil
 }
@@ -67,13 +70,15 @@ func (u *useCase) GetAllByRTId(ctx context.Context, rtId uuid.UUID) ([]ElectionI
 	items := make([]ElectionItem, 0)
 	for _, e := range elections {
 		items = append(items, ElectionItem{
-			Id:      e.Id,
-			Name:    e.Name,
-			StartAt: e.StartAt,
-			EndAt:   e.EndAt,
-			Status:  e.Status,
-			RTId:    e.RTId,
-			Year:    e.StartAt.Year(),
+			Id:             e.Id,
+			Name:           e.Name,
+			Status:         e.Status,
+			FinalizeStatus: e.FinalizeStatus,
+			StartAt:        e.StartAt,
+			EndAt:          e.EndAt,
+			FinalizedAt:    e.FinalizedAt,
+			RTId:           e.RTId,
+			Year:           e.StartAt.Year(),
 		})
 	}
 
@@ -87,15 +92,84 @@ func (u *useCase) GetById(ctx context.Context, id uuid.UUID) (*ElectionItem, err
 	}
 	fmt.Println("Election found:", e)
 	item := &ElectionItem{
-		Id:      e.Id,
-		Name:    e.Name,
-		StartAt: e.StartAt,
-		EndAt:   e.EndAt,
-		Status:  e.Status,
-		RTId:    e.RTId,
-		Year:    e.StartAt.Year(),
+		Id:             e.Id,
+		Name:           e.Name,
+		Status:         e.Status,
+		FinalizeStatus: e.FinalizeStatus,
+		StartAt:        e.StartAt,
+		EndAt:          e.EndAt,
+		FinalizedAt:    e.FinalizedAt,
+		RTId:           e.RTId,
+		Year:           e.StartAt.Year(),
 	}
 	return item, nil
+}
+
+func (u *useCase) GetDetail(ctx context.Context, id uuid.UUID) (*ElectionDetailResponse, error) {
+	e, err := u.repo.GetElectionByID(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+
+	resp := &ElectionDetailResponse{
+		ElectionId:     e.Id,
+		Name:           e.Name,
+		Status:         e.Status,
+		FinalizeStatus: e.FinalizeStatus,
+		StartAt:        e.StartAt,
+		EndAt:          e.EndAt,
+		FinalizedAt:    e.FinalizedAt,
+		SummaryHash:    e.SummaryHash,
+		BlockchainTx:   e.BlockchainTxHash,
+		Results:        []ElectionResultItem{},
+		TotalVotes:     0,
+	}
+
+	summaryJSON := e.SummaryJSON
+	if summaryJSON != nil && len(summaryJSON) > 0 {
+		var summary FinalizeElectionSummary
+		if err := json.Unmarshal([]byte(summaryJSON), &summary); err != nil {
+			log.Printf("[GetDetail] failed to unmarshal summary json: %v", err)
+		} else {
+			candidateIDs := make([]uuid.UUID, 0, len(summary.Results))
+			for _, r := range summary.Results {
+				cid, err := uuid.Parse(r.CandidateId)
+				if err != nil {
+					continue
+				}
+				candidateIDs = append(candidateIDs, cid)
+			}
+			candidates, err := u.repo.GetCandidatesByIDs(ctx, candidateIDs)
+			if err != nil {
+				log.Printf("[GetDetail] failed to load candidates: %v", err)
+			} else {
+				candMap := make(map[uuid.UUID]models.Candidate)
+				for _, c := range candidates {
+					candMap[c.Id] = c
+				}
+
+				for _, r := range summary.Results {
+					cid, err := uuid.Parse(r.CandidateId)
+					if err != nil {
+						continue
+					}
+					cand, ok := candMap[cid]
+					item := ElectionResultItem{
+						CandidateId: r.CandidateId,
+						Votes:       r.Total,
+					}
+					if ok {
+						item.CandidateName = cand.Name
+						item.PhotoURL = cand.PhotoURL
+					}
+					resp.Results = append(resp.Results, item)
+					resp.TotalVotes += r.Total
+				}
+			}
+		}
+	}
+
+	return resp, nil
 }
 
 func (u *useCase) UpdateStatus(ctx context.Context, id uuid.UUID, status string) error {
