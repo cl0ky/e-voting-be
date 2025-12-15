@@ -123,7 +123,7 @@ func (u *useCase) FinalizeElection(ctx context.Context, electionId uuid.UUID, us
 		return nil, fmt.Errorf("election not found")
 	}
 
-	if user.Role != "admin" || user.RTId == nil || election.RTId != *user.RTId {
+	if user.Role != "Admin" || user.RTId == nil || election.RTId != *user.RTId {
 		return nil, fmt.Errorf("forbidden: not election admin")
 	}
 

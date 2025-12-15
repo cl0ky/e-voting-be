@@ -20,6 +20,6 @@ func Init(rg *gin.RouterGroup, db *gorm.DB) {
 	group.GET("", ctrl.GetAll)
 	group.GET(":id", ctrl.GetDetail)
 	group.PATCH(":id", ctrl.UpdateStatus)
-	group.POST(":id/finalize", middleware.RoleMiddleware("admin"), ctrl.FinalizeElection)
+	group.POST(":id/finalize", middleware.RoleMiddleware("Admin"), ctrl.FinalizeElection)
 	group.GET(":id/verify", ctrl.VerifyElectionResult)
 }

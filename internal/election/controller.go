@@ -120,7 +120,7 @@ func (rc *controller) FinalizeElection(c *gin.Context) {
 		return
 	}
 	user, ok := userVal.(*models.User)
-	if !ok || user.Role != "admin" {
+	if !ok || user.Role != "Admin" {
 		c.JSON(403, gin.H{"error": "hanya admin yang boleh finalize"})
 		return
 	}
